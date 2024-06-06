@@ -1,6 +1,7 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy import MetaData
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import validates
 
 convention = {
   "ix": "ix_%(column_0_label)s",
@@ -22,6 +23,10 @@ class Author(db.Model, SerializerMixin):
     email = db.Column(db.String, nullable=False)
     birth_year = db.Column(db.Integer)
 
+    posts = db.relationship('Post', back_populates='author')
+    
+
+    serialize_rules = ('-posts.author',)
 
     def __repr__(self):
         return f"Author('{self.name}', '{self.email}', {self.birth_year})"
@@ -35,6 +40,11 @@ class Post(db.Model, SerializerMixin):
     content = db.Column(db.String, nullable=False)
     author_id = db.Column(db.Integer, db.ForeignKey('authors.id'))
 
+    author = db.relationship('Author', back_populates='posts')
+    comments = db.relationship('Comment', back_populates='post')
+
+    serialize_rules = ('-author.posts', '-comments.post',)
+
     def __repr__(self):
         return f"Post('{self.title}', '{self.content}')"
 
@@ -46,6 +56,11 @@ class Comment(db.Model, SerializerMixin):
     content = db.Column(db.String, nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'))
     author_id = db.Column(db.Integer, db.ForeignKey('authors.id'))
+
+    post = db.relationship('Post', back_populates='comments')
+    
+
+    serialize_rules = ('-post.comments',)
 
     def __repr__(self):
         return f"Comment('{self.content}')"
