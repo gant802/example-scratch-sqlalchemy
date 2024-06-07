@@ -25,8 +25,15 @@ if __name__ == '__main__':
                   birth_year = 1980
             )
 
-            db.session.add_all([a1, a2, a3])
+            a4 = Author(
+                  name = "Jacob",
+                  email = "jacob@example.com",
+                  birth_year = 1980
+            )
+
+            db.session.add_all([a1, a2, a3, a4])
             db.session.commit()
+
 
             p1 = Post(title="Cars", content="I love cars", author_id=2)
             p2 = Post(title="Willow Trees", content="I don't like willow trees", author_id=1)
