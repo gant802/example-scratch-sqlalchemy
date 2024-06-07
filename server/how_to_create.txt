@@ -1,0 +1,56 @@
+These are the steps needed to create this project from complete scratch
+
+-Initial setup-
+1. $ pipenv install
+2. $ pipenv shell
+- install all packages within terminal:
+3. $ pipenv install ipdb flask flask-sqlalchemy flask-migrate
+* flask: to create flask instance
+* flask-sqlalchemy: to create sqlalchemy instance for our models to inherit from (gives orm methods)
+* flask-migrate: to create migrations for our database
+4. $ mkdir server
+5. cd server
+6. $ touch config.py app.py models.py
+
+-Configure the flask application section-
+
+WITHIN config.py:
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+
+app = Flask(__name__)      (creates flask instance to define routes)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'  ---(tells flask application what the database URI is)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+convention = {
+  "ix": "ix_%(column_0_label)s",
+  "uq": "uq_%(table_name)s_%(column_0_name)s",
+  "ck": "ck_%(table_name)s_%(constraint_name)s",
+  "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
+  "pk": "pk_%(table_name)s"
+}
+
+metadata = MetaData(naming_convention=convention)
+
+db = SQLAlchemy(metadata=metadata)   -----(creates SQLAlchemy instance that allows access to model classes that our classes will inherit from. metadata for alembic naming conventions)
+
+migrate = Migrate(app, db)      ----(create migrate instance that is associated with flask application and database)
+
+db.init_app(app)    ----(connect SQLAlchemy instance to our app)
+
+WITHIN models.py
+from config import db   ----(for inheriting model class)
+
+
+WITHIN app.py
+from config import app, db
+from models import Post(example)
+
+
+IN SERVER DIRECTORY (in order to have db show as a usable command within the terminal if you type $ flask)
+1. $ export FLASK_APP=app.py  (tells where our flask app is located)
+2. $ export FLASK_RUN_PORT=5555  (tells the port we want to run it on)
+3. $ export FLASK_DEBUG=true  (putting on debug mode)
+4. $ flask db init  (initializes alembic)
+5. $ flask db migrate -m "initial migration" (creates first migration script)   ----Make sure there is a model class to actually migrate first
+6. $ flask db upgrade  (applies migration script to database)

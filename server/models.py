@@ -22,7 +22,7 @@ class Author(db.Model, SerializerMixin):
     __tablename__ = 'authors'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, unique=True, nullable=False) #! unique=True is a constraint that is added at the DATABASE LEVEL
     email = db.Column(db.String, nullable=False)
     birth_year = db.Column(db.Integer)
 
@@ -30,14 +30,10 @@ class Author(db.Model, SerializerMixin):
     
     serialize_rules = ('-posts.author',)
 
-    @validates('name')
+    @validates('name')   #! Validates input at a PYTHON LEVEL when you create an instance
     def validate_name(self, key, value):
         if not value:
             raise ValueError('Name must not be empty')
-        
-        existing_author = Author.query.filter_by(name=value).first()
-        if existing_author:
-            raise ValueError('Name is already in use')
         
         return value
     

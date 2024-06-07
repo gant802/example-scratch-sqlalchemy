@@ -25,13 +25,8 @@ if __name__ == '__main__':
                   birth_year = 1980
             )
 
-            a4 = Author(
-                  name = "Jacob",
-                  email = "jacob@example.com",
-                  birth_year = 1980
-            )
 
-            db.session.add_all([a1, a2, a3, a4])
+            db.session.add_all([a1, a2, a3])
             db.session.commit()
 
 
